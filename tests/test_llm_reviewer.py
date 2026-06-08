@@ -38,27 +38,37 @@ VALID_LLM_RESPONSE = {
     "reviewer_note": "Looks good."
 }
 
+@patch('llm_reviewer.os.environ.get')
 @patch('llm_reviewer.requests.post')
-def test_successful_llm_response(mock_post: MagicMock) -> None:
-    """Test that a successful Ollama response is parsed correctly."""
+def test_successful_llm_response(mock_post: MagicMock, mock_env_get: MagicMock) -> None:
+    """Test that a successful Groq response is parsed correctly."""
+    mock_env_get.return_value = "fake_key"
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "response": json.dumps(VALID_LLM_RESPONSE)
+        "choices": [
+            {
+                "message": {
+                    "content": json.dumps(VALID_LLM_RESPONSE)
+                }
+            }
+        ]
     }
     mock_post.return_value = mock_response
     
     result = analyze_with_llm(SAMPLE_DIFF, SAMPLE_FINDINGS, "zones/example.com.txt")
     
     assert result["llm_available"] is True
-    assert result["model_used"] == "llama3.2"
+    assert result["model_used"] == "llama3-8b-8192"
     assert result["risk_level"] == "LOW"
     assert len(result["llm_findings"]) == 1
     assert result["llm_findings"][0]["title"] == "A Record Changed"
 
+@patch('llm_reviewer.os.environ.get')
 @patch('llm_reviewer.requests.post')
-def test_fallback_unreachable(mock_post: MagicMock) -> None:
-    """Test that when Ollama is unreachable, it gracefully falls back."""
+def test_fallback_unreachable(mock_post: MagicMock, mock_env_get: MagicMock) -> None:
+    """Test that when Groq is unreachable, it gracefully falls back."""
+    mock_env_get.return_value = "fake_key"
     mock_post.side_effect = requests.exceptions.ConnectionError("Connection refused")
     
     result = analyze_with_llm(SAMPLE_DIFF, SAMPLE_FINDINGS, "zones/example.com.txt")
@@ -70,20 +80,28 @@ def test_fallback_unreachable(mock_post: MagicMock) -> None:
     assert result["llm_findings"][0]["severity"] == "WARNING"
     assert "LLM review skipped" in result["reviewer_note"]
 
+@patch('llm_reviewer.os.environ.get')
 @patch('llm_reviewer.requests.post')
-def test_fallback_invalid_json(mock_post: MagicMock) -> None:
+def test_fallback_invalid_json(mock_post: MagicMock, mock_env_get: MagicMock) -> None:
     """Test that invalid JSON from the LLM falls back to validator findings."""
+    mock_env_get.return_value = "fake_key"
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "response": "This is not valid JSON."
+        "choices": [
+            {
+                "message": {
+                    "content": "This is not valid JSON."
+                }
+            }
+        ]
     }
     mock_post.return_value = mock_response
     
     result = analyze_with_llm(SAMPLE_DIFF, SAMPLE_FINDINGS, "zones/example.com.txt")
     
     assert result["llm_available"] is True
-    assert result["model_used"] == "llama3.2"
+    assert result["model_used"] == "llama3-8b-8192"
     assert result["risk_level"] == "MEDIUM"
     assert len(result["llm_findings"]) == 1
 

@@ -9,15 +9,15 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from typing import Any, Dict, List, Mapping, Sequence
 
 import requests
 
 logger = logging.getLogger(__name__)
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-PRIMARY_MODEL = "llama3.2"
-FALLBACK_MODEL = "llama3"
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+PRIMARY_MODEL = "llama3-8b-8192"
 TIMEOUT_SECONDS = 60
 
 def _get_fallback_response(
@@ -79,17 +79,18 @@ def analyze_with_llm(diff: str, validator_findings: Sequence[Mapping[str, Any]],
     """
     validator_findings_json = json.dumps(validator_findings, indent=2)
     
-    prompt = f"""SYSTEM:
-You are a DNS security expert reviewing DNS zone file changes 
+    # Parse the prompt into system and user for Groq messages array
+    # The prompt consists of SYSTEM: ... USER: ...
+    # We will just split it simple or define it explicitly:
+    system_prompt = """You are a DNS security expert reviewing DNS zone file changes 
 in a GitHub Pull Request. Your job is to identify risky or 
 dangerous DNS changes that could cause outages, security 
 vulnerabilities, or email delivery failures.
 
 Always respond in valid JSON only. No markdown. No explanation 
-outside the JSON.
+outside the JSON."""
 
-USER:
-I need you to review this DNS zone file change.
+    user_prompt = f"""I need you to review this DNS zone file change.
 
 Filename: {filename}
 
@@ -127,48 +128,55 @@ Focus especially on:
 
 Return ONLY the JSON. No markdown fences. No explanation."""
 
-    for model in [PRIMARY_MODEL, FALLBACK_MODEL]:
-        payload = {
-            "model": model,
-            "prompt": prompt,
-            "stream": False,
-            "format": "json"
-        }
-        
-        try:
-            response = requests.post(OLLAMA_URL, json=payload, timeout=TIMEOUT_SECONDS)
-            if response.status_code == 200:
-                result_text = response.json().get("response", "")
-                
-                # Strip markdown fences if the LLM ignored instructions
-                result_text = result_text.strip()
-                if result_text.startswith("```json"):
-                    result_text = result_text[7:]
-                elif result_text.startswith("```"):
-                    result_text = result_text[3:]
-                
-                if result_text.endswith("```"):
-                    result_text = result_text[:-3]
-                    
-                result_text = result_text.strip()
-                
-                try:
-                    parsed_result = json.loads(result_text)
-                    parsed_result["llm_available"] = True
-                    parsed_result["model_used"] = model
-                    return parsed_result
-                except json.JSONDecodeError as e:
-                    logger.error(f"Failed to parse LLM JSON response for model {model}: {e}")
-                    return _get_fallback_response(validator_findings, llm_available=True, model_used=model)
-            elif response.status_code == 404:
-                logger.warning(f"Model {model} not found in Ollama, trying fallback.")
-                continue
-            else:
-                logger.error(f"Ollama API returned status {response.status_code}")
-                continue
-                
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to reach Ollama API: {e}")
-            break
+    api_key = os.environ.get("GROQ_API_KEY")
+    if not api_key:
+        logger.error("GROQ_API_KEY environment variable not set.")
+        return _get_fallback_response(validator_findings, llm_available=False, model_used="none")
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": PRIMARY_MODEL,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.1,
+        "max_tokens": 1000
+    }
+    
+    try:
+        response = requests.post(GROQ_URL, json=payload, headers=headers, timeout=TIMEOUT_SECONDS)
+        if response.status_code == 200:
+            result_text = response.json()["choices"][0]["message"]["content"]
             
+            # Strip markdown fences if the LLM ignored instructions
+            result_text = result_text.strip()
+            if result_text.startswith("```json"):
+                result_text = result_text[7:]
+            elif result_text.startswith("```"):
+                result_text = result_text[3:]
+            
+            if result_text.endswith("```"):
+                result_text = result_text[:-3]
+                
+            result_text = result_text.strip()
+            
+            try:
+                parsed_result = json.loads(result_text)
+                parsed_result["llm_available"] = True
+                parsed_result["model_used"] = PRIMARY_MODEL
+                return parsed_result
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse LLM JSON response for model {PRIMARY_MODEL}: {e}")
+                return _get_fallback_response(validator_findings, llm_available=True, model_used=PRIMARY_MODEL)
+        else:
+            logger.error(f"Groq API returned status {response.status_code}: {response.text}")
+            
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to reach Groq API: {e}")
+        
     return _get_fallback_response(validator_findings, llm_available=False, model_used="none")

@@ -35,17 +35,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Install and start Ollama with llama3.2 model
-      # continue-on-error ensures the bot still runs in validator-only mode
-      # if Ollama setup fails (e.g. resource limits on the runner)
-      - name: Setup Ollama
-        run: |
-          curl -fsSL https://ollama.com/install.sh | sh
-          ollama serve &
-          sleep 5
-          ollama pull llama3.2
-        continue-on-error: true
-
       # Runs src/main.py with all required environment variables
       - name: Run DNS Reviewer
         run: python src/main.py
@@ -54,7 +43,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           GITHUB_BASE_REF: ${{ github.base_ref }}
-          OLLAMA_HOST: http://localhost:11434
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
       # Upload the PR comment markdown as a build artifact
       # Runs even if the reviewer step fails so the review is always preserved

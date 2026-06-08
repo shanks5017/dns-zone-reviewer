@@ -20,6 +20,12 @@ import sys
 from pathlib import Path
 from typing import Any, Dict
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # Load environment variables from .env file
+except ImportError:
+    pass  # python-dotenv not installed, proceed with OS env vars
+
 # Ensure src/ is importable when run directly
 sys.path.insert(0, os.path.dirname(__file__))
 
