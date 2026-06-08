@@ -59,7 +59,7 @@ def test_successful_llm_response(mock_post: MagicMock, mock_env_get: MagicMock) 
     result = analyze_with_llm(SAMPLE_DIFF, SAMPLE_FINDINGS, "zones/example.com.txt")
     
     assert result["llm_available"] is True
-    assert result["model_used"] == "llama3-8b-8192"
+    assert result["model_used"] == "llama-3.1-8b-instant"
     assert result["risk_level"] == "LOW"
     assert len(result["llm_findings"]) == 1
     assert result["llm_findings"][0]["title"] == "A Record Changed"

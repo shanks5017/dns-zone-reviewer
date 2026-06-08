@@ -17,7 +17,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-PRIMARY_MODEL = "llama3-8b-8192"
+PRIMARY_MODEL = "llama-3.1-8b-instant"
 TIMEOUT_SECONDS = 60
 
 def _get_fallback_response(
