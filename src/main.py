@@ -20,6 +20,12 @@ import sys
 from pathlib import Path
 from typing import Any, Dict
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # Load environment variables from .env file
+except ImportError:
+    pass  # python-dotenv not installed, proceed with OS env vars
+
 # Ensure src/ is importable when run directly
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -178,8 +184,14 @@ def main() -> None:
             pr_number=gh_env["pr_number"],
         )
     else:
-        # Local development fallback: print comment to stdout
-        print("\n" + full_comment + "\n")
+        # Local development fallback: print comment to stdout safely for Windows
+        try:
+            print("\n" + full_comment + "\n")
+        except UnicodeEncodeError:
+            # Fallback for terminals that don't support emojis (like standard Windows cmd/powershell)
+            safe_comment = full_comment.encode('ascii', 'replace').decode('ascii')
+            print("\n" + safe_comment + "\n")
+            print("[main] Note: Some emojis could not be printed to the terminal, but the markdown file is intact.", file=sys.stderr)
 
     # Step 6: Save to /tmp/pr_comment.md
     output_path = Path("/tmp/pr_comment.md")

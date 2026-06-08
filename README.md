@@ -28,7 +28,7 @@ GitHub PR Comment Posted (outputs findings & merge recommendations)
 |-----------|-----------|
 | CI/CD | GitHub Actions |
 | DNS Validation | Python dnspython |
-| LLM Risk Analysis | Ollama (llama3.2) |
+| LLM Risk Analysis | Groq API (llama3-8b-8192) |
 | PR Integration | GitHub REST API |
 | Testing | Pytest (50 tests) |
 | Language | Python 3.11 |
@@ -43,10 +43,9 @@ GitHub PR Comment Posted (outputs findings & merge recommendations)
    ```bash
    pip install -r requirements.txt
    ```
-3. Install Ollama and pull llama3.2
+3. Set GROQ_API_KEY environment variable
    ```bash
-   # Follow instructions at https://ollama.com to install Ollama
-   ollama run llama3.2
+   export GROQ_API_KEY="your_groq_api_key"
    ```
 4. Set environment variables
    ```bash

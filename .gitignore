@@ -24,3 +24,7 @@ build/
 # Temporary files
 /tmp/
 pr_comment.md
+
+# Environments
+.env
+.env.*
