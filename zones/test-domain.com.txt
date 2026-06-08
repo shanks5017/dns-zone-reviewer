@@ -1,0 +1,10 @@
+$ORIGIN test-domain.com.
+$TTL 86400
+
+; Missing NS records intentionally
+
+; A wildcard record *.test-domain.com
+*   IN  A   192.0.2.100
+
+; An MX record with TTL of 60 (dangerously low)
+@   60  IN  MX  10 mail.test-domain.com.

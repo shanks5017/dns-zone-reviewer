@@ -1,0 +1,3 @@
+# AI Prompts Used During Development
+
+- Create a production-grade GitHub Action project from scratch with the following structure: Project name: dns-zone-reviewer...
