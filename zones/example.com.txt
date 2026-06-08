@@ -26,5 +26,5 @@ www IN  A   192.0.2.1
 ; TXT record for SPF
 @   IN  TXT "v=spf1 mx a ~all"
 
-; DANGEROUS RECORD FOR TESTING
-*.example.com. 60 IN A 1.2.3.4
+; Safe TXT record for Google Site Verification
+@   IN  TXT "google-site-verification=123456789"
