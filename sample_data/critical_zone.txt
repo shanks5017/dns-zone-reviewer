@@ -1,0 +1,15 @@
+$ORIGIN critical.example.com.
+$TTL 86400
+
+; This zone is intentionally broken:
+;   - Missing SOA record (CRITICAL — RFC 1035 §3.3.13)
+;   - Missing NS record  (CRITICAL — RFC 1035 §3.3.11)
+; A real name server would reject this zone entirely.
+
+; A records with no delegation infrastructure
+@       IN  A   192.0.2.1
+www     IN  A   192.0.2.1
+
+; MX record (will still parse, but zone is fundamentally invalid)
+@       IN  MX  10 mail.critical.example.com.
+mail    IN  A   192.0.2.10
