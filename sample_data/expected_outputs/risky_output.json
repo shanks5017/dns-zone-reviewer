@@ -1,0 +1,48 @@
+{
+  "valid": true,
+  "errors": [],
+  "findings": [
+    {
+      "severity": "CRITICAL",
+      "record_type": "A",
+      "description": "Wildcard record '*.risky.example.com.' found. Wildcards can silently match unintended queries and are a common source of misconfiguration or DNS hijacking risk.",
+      "record": "*.risky.example.com. 86400 IN A 203.0.113.99"
+    },
+    {
+      "severity": "WARNING",
+      "record_type": "MX",
+      "description": "MX record for 'risky.example.com.' has TTL 60s, which is below the recommended minimum of 300s. Low MX TTLs can cause mail delivery failures during DNS propagation events.",
+      "record": "risky.example.com. 60 IN MX 10 new-mail-provider.risky.example.com."
+    },
+    {
+      "severity": "WARNING",
+      "record_type": "A",
+      "description": "A record for 'www.risky.example.com.' has TTL 120s, which is below the recommended minimum of 300s. Short TTLs increase resolver load and may expose the zone to cache-miss amplification.",
+      "record": "www.risky.example.com. 120 IN A 203.0.113.50"
+    },
+    {
+      "severity": "INFO",
+      "record_type": "TXT",
+      "description": "New TXT record added in new zone file for 'risky.example.com.'.",
+      "record": "risky.example.com. 86400 IN TXT \"v=spf1 mx ~all\""
+    },
+    {
+      "severity": "INFO",
+      "record_type": "A",
+      "description": "New A record added in new zone file for 'risky.example.com.'.",
+      "record": "risky.example.com. 86400 IN A 203.0.113.50"
+    },
+    {
+      "severity": "INFO",
+      "record_type": "A",
+      "description": "New A record added in new zone file for '*.risky.example.com.'.",
+      "record": "*.risky.example.com. 86400 IN A 203.0.113.99"
+    },
+    {
+      "severity": "INFO",
+      "record_type": "A",
+      "description": "New A record added in new zone file for 'www.risky.example.com.'.",
+      "record": "www.risky.example.com. 120 IN A 203.0.113.50"
+    }
+  ]
+}
