@@ -1,6 +1,6 @@
 # AI Usage Note
 
-## What AI Helped With
+## How AI Helped With
 - Generated the dnspython zone parsing logic, including properly handling `dns.exception.DNSException` during parsing.
 - Wrote the regular expressions and string matching logic for diffing old and new zone files in `differ.py`.
 - Scaffolded the GitHub Actions workflow file (`.github/workflows/dns-review.yml`) with the correct event triggers and environment variables.
