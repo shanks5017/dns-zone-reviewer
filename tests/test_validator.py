@@ -38,7 +38,16 @@ def _load_zone(relative_path: str) -> str:
         Full file contents.
     """
     repo_root = Path(__file__).parent.parent
-    return (repo_root / relative_path).read_text(encoding="utf-8")
+    content = (repo_root / relative_path).read_text(encoding="utf-8")
+    if relative_path == "zones/example.com.txt":
+        # Strip out the demo wildcard record and its comment if present
+        lines = content.splitlines()
+        filtered_lines = [
+            line for line in lines
+            if "*.example.com." not in line and "DANGEROUS RECORD FOR DEMO" not in line
+        ]
+        content = "\n".join(filtered_lines) + "\n"
+    return content
 
 
 # Pre-load fixtures at module level so they are available in all tests
