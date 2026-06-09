@@ -161,14 +161,14 @@ class TestValidCleanZone:
     def test_no_findings(self) -> None:
         """A clean zone file should produce zero findings of any severity.
 
-        We pass before_content=EXAMPLE_COM_CONTENT (same content) to simulate
-        a no-op edit.  This suppresses INFO 'new record' findings that would
-        otherwise fire when before_content is None (new-file scenario).
+        Uses the inline _VALID_MINIMAL_ZONE fixture instead of example.com.txt,
+        since example.com.txt is used as a live demo zone and may contain
+        intentional risky records (e.g. wildcards) for bot testing purposes.
         """
         result = validate_zone(
-            zone_content=EXAMPLE_COM_CONTENT,
-            filename="zones/example.com.txt",
-            before_content=EXAMPLE_COM_CONTENT,  # same content → zero diff findings
+            zone_content=_VALID_MINIMAL_ZONE,
+            filename="zones/minimal.example.txt",
+            before_content=_VALID_MINIMAL_ZONE,  # same content → zero diff findings
         )
         assert result["findings"] == [], (
             f"Expected no findings but got: {result['findings']}"

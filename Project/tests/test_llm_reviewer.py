@@ -101,7 +101,7 @@ def test_fallback_invalid_json(mock_post: MagicMock, mock_env_get: MagicMock) ->
     result = analyze_with_llm(SAMPLE_DIFF, SAMPLE_FINDINGS, "zones/example.com.txt")
     
     assert result["llm_available"] is True
-    assert result["model_used"] == "llama3-8b-8192"
+    assert result["model_used"] == "llama-3.1-8b-instant"
     assert result["risk_level"] == "MEDIUM"
     assert len(result["llm_findings"]) == 1
 
