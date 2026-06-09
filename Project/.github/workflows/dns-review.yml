@@ -1,0 +1,55 @@
+name: DNS Zone Reviewer
+
+on:
+  pull_request:
+    paths:
+      # Trigger ONLY when a PR touches any file inside zones/*.txt
+      - 'zones/*.txt'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    # Runs on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out the repo with full git history (fetch-depth: 0)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      # Sets up Python 3.11
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip' # Optional but good practice for production
+
+      # Installs dependencies from requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Runs src/main.py with all required environment variables
+      - name: Run DNS Reviewer
+        run: python src/main.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+      # Upload the PR comment markdown as a build artifact
+      # Runs even if the reviewer step fails so the review is always preserved
+      - name: Upload review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dns-review-comment
+          path: /tmp/pr_comment.md
+        if: always()

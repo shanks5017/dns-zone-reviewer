@@ -1,0 +1,28 @@
+$ORIGIN example.com.
+$TTL 86400
+
+; SOA record
+@   IN  SOA ns1.example.com. admin.example.com. (
+            2023102401 ; Serial
+            3600       ; Refresh
+            1800       ; Retry
+            604800     ; Expire
+            86400      ; Minimum TTL
+)
+
+; NS records
+@   IN  NS  ns1.example.com.
+@   IN  NS  ns2.example.com.
+
+; A record for root domain
+@   IN  A   192.0.2.1
+
+; A record for www
+www IN  A   192.0.2.1
+
+; MX record
+@   IN  MX  10 mail.example.com.
+
+; TXT record for SPF
+@   IN  TXT "v=spf1 mx a ~all"
+

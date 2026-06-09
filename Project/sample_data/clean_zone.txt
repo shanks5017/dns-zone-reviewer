@@ -1,0 +1,36 @@
+$ORIGIN clean.example.com.
+$TTL 86400
+
+; SOA record
+@   IN  SOA ns1.clean.example.com. admin.clean.example.com. (
+            2025060801 ; Serial (YYYYMMDDNN format)
+            3600       ; Refresh  (1 hour)
+            1800       ; Retry    (30 minutes)
+            604800     ; Expire   (7 days)
+            86400      ; Minimum TTL (1 day)
+)
+
+; NS records — minimum two for proper delegation
+@   IN  NS  ns1.clean.example.com.
+@   IN  NS  ns2.clean.example.com.
+
+; A records for nameservers (glue records)
+ns1 IN  A   198.51.100.1
+ns2 IN  A   198.51.100.2
+
+; A record for root domain
+@   IN  A   203.0.113.10
+
+; A record for www subdomain
+www IN  A   203.0.113.10
+
+; MX records with proper priority and safe TTL
+@   IN  MX  10 mail.clean.example.com.
+@   IN  MX  20 mail-backup.clean.example.com.
+
+; A records for mail servers
+mail        IN  A   203.0.113.20
+mail-backup IN  A   203.0.113.21
+
+; TXT records for email security
+@   IN  TXT "v=spf1 mx a ip4:203.0.113.0/24 -all"

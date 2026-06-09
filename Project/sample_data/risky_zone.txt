@@ -1,0 +1,30 @@
+$ORIGIN risky.example.com.
+$TTL 86400
+
+; SOA record
+@   IN  SOA ns1.risky.example.com. admin.risky.example.com. (
+            2025060801 ; Serial
+            3600       ; Refresh
+            1800       ; Retry
+            604800     ; Expire
+            86400      ; Minimum TTL
+)
+
+; NS records
+@   IN  NS  ns1.risky.example.com.
+@   IN  NS  ns2.risky.example.com.
+
+; A record for root domain
+@   IN  A   203.0.113.50
+
+; WILDCARD record — catches ALL unmatched queries (CRITICAL risk)
+*   IN  A   203.0.113.99
+
+; MX record with dangerously low TTL (60s < 300s minimum)
+@   60  IN  MX  10 new-mail-provider.risky.example.com.
+
+; A record for www with low TTL
+www 120 IN  A   203.0.113.50
+
+; TXT record
+@   IN  TXT "v=spf1 mx ~all"

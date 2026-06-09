@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dns-zone-reviewer"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "dnspython",
+    "requests",
+]
+
+# ---------------------------------------------------------------------------
+# Tell setuptools where the top-level modules live (flat src/ layout)
+# ---------------------------------------------------------------------------
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ---------------------------------------------------------------------------
+# Pytest – pythonpath key (pytest ≥ 7) adds src/ to sys.path automatically
+# This is the modern replacement for the conftest.py path insertion trick.
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths  = ["tests"]
+
+# ---------------------------------------------------------------------------
+# Pyright / Pylance – resolve src/ modules without a venv
+# The [tool.pyright] table is read by most modern IDE integrations.
+# ---------------------------------------------------------------------------
+[tool.pyright]
+pythonVersion    = "3.10"
+pythonPlatform   = "Windows"
+venvPath         = "."
+venv             = ".venv"
+extraPaths       = ["src"]
+include          = ["src", "tests"]
+reportMissingModuleSource = false
+

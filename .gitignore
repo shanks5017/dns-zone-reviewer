@@ -1,0 +1,21 @@
+# Exclude the nested git repo and virtual environment inside Project/
+Project/.git/
+Project/.git_backup/
+Project/.venv/
+Project/__pycache__/
+Project/.pytest_cache/
+Project/src/__pycache__/
+Project/src/dns_zone_reviewer.egg-info/
+Project/tests/__pycache__/
+Project/.env
+
+# Duplicates copied during restructure (keep only at root level)
+Project/Document/
+Project/Resume/
+Project/Team1/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
