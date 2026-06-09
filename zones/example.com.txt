@@ -3,7 +3,7 @@ $TTL 86400
 
 ; SOA record
 @   IN  SOA ns1.example.com. admin.example.com. (
-            2023102401 ; Serial
+            2023102402 ; Serial (bumped for this change)
             3600       ; Refresh
             1800       ; Retry
             604800     ; Expire
@@ -20,9 +20,17 @@ $TTL 86400
 ; A record for www
 www IN  A   192.0.2.1
 
+; New A record for api subdomain
+api IN  A   192.0.2.10
+
+; New A record for staging subdomain
+staging IN  A   192.0.2.20
+
 ; MX record
 @   IN  MX  10 mail.example.com.
 
 ; TXT record for SPF
 @   IN  TXT "v=spf1 mx a ~all"
 
+; DKIM TXT record
+mail._domainkey IN  TXT "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA"
