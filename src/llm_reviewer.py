@@ -1,7 +1,7 @@
 """
-llm_reviewer.py - LLM Risk Flagger for DNS Zone Reviewer using Ollama.
+llm_reviewer.py - LLM Risk Flagger for DNS Zone Reviewer using Groq.
 
-Analyzes DNS zone file diffs and validator findings using a local LLM
+Analyzes DNS zone file diffs and validator findings using Groq LLM
 to provide human-readable risk assessments and summaries.
 """
 
